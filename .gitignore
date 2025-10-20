@@ -2,3 +2,4 @@
 *.wav
 *.json
 Очистка от больших медиа и временных файлов
+.watch_and_transcribe.log
