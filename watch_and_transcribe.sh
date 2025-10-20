@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --- КОНФИГУРАЦИЯ ---
-WATCH_DIR="/path/to/your/watch/folder" # Укажите путь к папке для мониторинга
+WATCH_DIR="/media/windows/ai-automator/" # Укажите путь к папке для мониторинга
 LOG_FILE="$(dirname "$0")/.watch_and_transcribe.log"
 
 # --- ФУНКЦИИ ---
