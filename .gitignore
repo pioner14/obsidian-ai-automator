@@ -2,4 +2,5 @@
 *.wav
 *.json
 Очистка от больших медиа и временных файлов
-.watch_and_transcribe.log
+.deepgram_api_key
+ai_analyzer.log
