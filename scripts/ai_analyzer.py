@@ -3,38 +3,40 @@ import json
 import requests
 import os
 import re
+from faster_whisper import WhisperModel
 
 # --- КОНФИГУРАЦИЯ ---
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
-# Используем рекомендованную модель, лучше следующую инструкциям
 OLLAMA_MODEL = "phi3:mini" 
-# ! ОБНОВИТЕ ПУТЬ !
-OBSIDIAN_VAULT_PATH = os.path.expanduser("/home/nick/Obsidian_Vault/Auto_Notes") 
+OBSIDIAN_VAULT_PATH = os.path.expanduser("/home/nick/Obsidian Vault/Auto_Notes") 
+WHISPER_MODEL_SIZE = "medium" # Используем medium, faster-whisper будет управлять устройством
 # ---------------------
 
-def read_transcript(json_path):
-    """Читает JSON-файл Whisper.cpp и возвращает полный текст с тайм-кодами."""
+def transcribe_audio_with_faster_whisper(audio_path):
+    """Транскрибирует аудиофайл с помощью faster-whisper, используя GPU или CPU."""
     try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        full_text = []
-        for segment in data.get('segments', []):
-            start = segment.get('start')
-            text = segment.get('text').strip()
-            # Формат для удобства LLM-анализа (HH:MM:SS)
-            start_time = str(int(start // 3600)).zfill(2) + ':' + \
-                         str(int((start % 3600) // 60)).zfill(2) + ':' + \
-                         str(int(start % 60)).zfill(2)
-            full_text.append(f"[{start_time}] {text}")
-        return "\n".join(full_text)
+        # Попытка использовать GPU с float16 для лучшей производительности и меньшего потребления памяти
+        model = WhisperModel(WHISPER_MODEL_SIZE, device="cuda", compute_type="float16")
+        print(f"Faster-Whisper: Используется GPU ({WHISPER_MODEL_SIZE}, float16).")
     except Exception as e:
-        print(f"Error reading transcript: {e}")
-        return None
+        print(f"Faster-Whisper: Ошибка при инициализации GPU ({e}). Переключение на CPU.")
+        model = WhisperModel(WHISPER_MODEL_SIZE, device="cpu", compute_type="int8")
+        print(f"Faster-Whisper: Используется CPU ({WHISPER_MODEL_SIZE}, int8).")
+
+    segments, info = model.transcribe(audio_path, beam_size=5, language="ru")
+    
+    full_text = []
+    for segment in segments:
+        start_time = str(int(segment.start // 3600)).zfill(2) + ':' + \
+                     str(int((segment.start % 3600) // 60)).zfill(2) + ':' + \
+                     str(int(segment.start % 60)).zfill(2)
+        full_text.append(f"[{start_time}] {segment.text.strip()}")
+    
+    return "\n".join(full_text)
 
 def analyze_with_ollama(transcript):
     """Отправляет транскрипт в Ollama и получает структурированный Markdown."""
     
-    # Ключевой промпт для LLM! Направляет Phi-3 на нужный формат.
     prompt = f"""Ты — ИИ-аналитик, помогающий исследователю из Общества Сторожевой Башни. 
     Твоя задача — проанализировать стенограмму лекции на русском языке, чтобы найти ключевые "наглядные пособия" или "примеры" для дальнейшего исследования.
 
@@ -72,7 +74,7 @@ def analyze_with_ollama(transcript):
         "model": OLLAMA_MODEL,
         "prompt": prompt,
         "stream": False,
-        "options": {"temperature": 0.3} # Уменьшаем креативность, увеличиваем точность
+        "options": {"temperature": 0.3}
     }
 
     try:
@@ -84,34 +86,34 @@ def analyze_with_ollama(transcript):
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python ai_analyzer.py <path_to_transcript.json>")
+        print("Usage: python ai_analyzer.py <path_to_audio.wav>")
         sys.exit(1)
 
-    transcript_json_path = sys.argv[1]
-    transcript_with_timecodes = read_transcript(transcript_json_path)
+    audio_path = sys.argv[1]
+    
+    print(f"-> Транскрипция аудио: {audio_path}...")
+    transcript_with_timecodes = transcribe_audio_with_faster_whisper(audio_path)
     
     if not transcript_with_timecodes:
+        print("Ошибка: Транскрипция не удалась или вернула пустой результат.")
         sys.exit(1)
 
-    # 1. Запуск Ollama для анализа
+    print("-> Анализ LLM (Ollama)...")
     markdown_output = analyze_with_ollama(transcript_with_timecodes)
     
     if markdown_output.startswith("Error"):
         print(f"Ошибка LLM-анализа: {markdown_output}")
         sys.exit(1)
 
-    # 2. Извлечение заголовка для имени файла
     title_line = next((line for line in markdown_output.split('\n') if line.startswith('title:')), None)
     if title_line:
         file_title = title_line.split('title:')[1].strip().strip('[]')
-        # Очистка заголовка от символов для безопасного имени файла
         safe_filename = re.sub(r'[^\w\s-]', '', file_title).strip()
         safe_filename = re.sub(r'[-\s]+', '_', safe_filename)
         filename = f"{safe_filename}.md"
     else:
-        filename = f"LLM_Analysis_Error_{os.path.basename(transcript_json_path).replace('.json', '.md')}"
+        filename = f"LLM_Analysis_Error_{os.path.basename(audio_path).replace('.wav', '.md')}"
 
-    # 3. Запись в Obsidian Vault (Syncthing подхватит)
     output_path = os.path.join(OBSIDIAN_VAULT_PATH, filename)
     os.makedirs(OBSIDIAN_VAULT_PATH, exist_ok=True)
     
