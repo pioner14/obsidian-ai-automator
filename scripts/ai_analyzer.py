@@ -10,7 +10,7 @@ from faster_whisper import WhisperModel
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
 OLLAMA_MODEL = "phi3:mini" 
 OBSIDIAN_VAULT_PATH = os.path.expanduser("/home/nick/Obsidian Vault/Auto_Notes") 
-WHISPER_MODEL_SIZE = "medium" # Используем medium, faster-whisper будет управлять устройством
+WHISPER_MODEL_SIZE = "tiny" # Используем tiny, faster-whisper будет управлять устройством
 # ---------------------
 
 def transcribe_audio_with_faster_whisper(audio_path):
