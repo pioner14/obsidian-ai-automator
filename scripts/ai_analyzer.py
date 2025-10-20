@@ -3,6 +3,7 @@ import json
 import requests
 import os
 import re
+import logging
 from faster_whisper import WhisperModel
 
 # --- КОНФИГУРАЦИЯ ---
@@ -17,11 +18,11 @@ def transcribe_audio_with_faster_whisper(audio_path):
     try:
         # Попытка использовать GPU с float16 для лучшей производительности и меньшего потребления памяти
         model = WhisperModel(WHISPER_MODEL_SIZE, device="cuda", compute_type="float16")
-        print(f"Faster-Whisper: Используется GPU ({WHISPER_MODEL_SIZE}, float16).")
+        logging.info(f"Faster-Whisper: Используется GPU ({WHISPER_MODEL_SIZE}, float16).")
     except Exception as e:
-        print(f"Faster-Whisper: Ошибка при инициализации GPU ({e}). Переключение на CPU.")
+        logging.error(f"Faster-Whisper: Ошибка при инициализации GPU ({e}). Переключение на CPU.")
         model = WhisperModel(WHISPER_MODEL_SIZE, device="cpu", compute_type="int8")
-        print(f"Faster-Whisper: Используется CPU ({WHISPER_MODEL_SIZE}, int8).")
+        logging.info(f"Faster-Whisper: Используется CPU ({WHISPER_MODEL_SIZE}, int8).")
 
     segments, info = model.transcribe(audio_path, beam_size=5, language="ru")
     
@@ -85,24 +86,33 @@ def analyze_with_ollama(transcript):
         return f"Error communicating with Ollama: {e}"
 
 def main():
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        handlers=[
+                            logging.FileHandler("ai_analyzer.log"),
+                            logging.StreamHandler()
+                        ])
+    logging.info("Запуск скрипта ai_analyzer.py")
     if len(sys.argv) < 2:
         print("Usage: python ai_analyzer.py <path_to_audio.wav>")
         sys.exit(1)
 
     audio_path = sys.argv[1]
     
-    print(f"-> Транскрипция аудио: {audio_path}...")
+    logging.info(f"Начало транскрипции аудио: {audio_path}...")
     transcript_with_timecodes = transcribe_audio_with_faster_whisper(audio_path)
+    logging.info("Транскрипция завершена.")
     
     if not transcript_with_timecodes:
-        print("Ошибка: Транскрипция не удалась или вернула пустой результат.")
+        logging.error("Ошибка: Транскрипция не удалась или вернула пустой результат.")
         sys.exit(1)
 
-    print("-> Анализ LLM (Ollama)...")
+    logging.info("Начало анализа LLM (Ollama)...")
     markdown_output = analyze_with_ollama(transcript_with_timecodes)
+    logging.info("Анализ LLM завершен.")
     
     if markdown_output.startswith("Error"):
-        print(f"Ошибка LLM-анализа: {markdown_output}")
+        logging.error(f"Ошибка LLM-анализа: {markdown_output}")
         sys.exit(1)
 
     title_line = next((line for line in markdown_output.split('\n') if line.startswith('title:')), None)
@@ -120,7 +130,7 @@ def main():
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(markdown_output)
 
-    print(f"Успех. Obsidian заметка создана: {output_path}")
+    logging.info(f"Успех. Obsidian заметка создана: {output_path}")
 
 if __name__ == "__main__":
     main()
