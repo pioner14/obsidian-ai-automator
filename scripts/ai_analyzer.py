@@ -15,14 +15,9 @@ WHISPER_MODEL_SIZE = "medium" # Используем medium, faster-whisper бу
 
 def transcribe_audio_with_faster_whisper(audio_path):
     """Транскрибирует аудиофайл с помощью faster-whisper, используя GPU или CPU."""
-    try:
-        # Попытка использовать GPU с float16 для лучшей производительности и меньшего потребления памяти
-        model = WhisperModel(WHISPER_MODEL_SIZE, device="cuda", compute_type="float16")
-        logging.info(f"Faster-Whisper: Используется GPU ({WHISPER_MODEL_SIZE}, float16).")
-    except Exception as e:
-        logging.error(f"Faster-Whisper: Ошибка при инициализации GPU ({e}). Переключение на CPU.")
-        model = WhisperModel(WHISPER_MODEL_SIZE, device="cpu", compute_type="int8")
-        logging.info(f"Faster-Whisper: Используется CPU ({WHISPER_MODEL_SIZE}, int8).")
+    # Принудительное использование CPU для Faster-Whisper, чтобы избежать проблем с VRAM
+    model = WhisperModel(WHISPER_MODEL_SIZE, device="cpu", compute_type="int8")
+    logging.info(f"Faster-Whisper: Принудительно используется CPU ({WHISPER_MODEL_SIZE}, int8).")
 
     segments, info = model.transcribe(audio_path, beam_size=5, language="ru")
     
