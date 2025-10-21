@@ -5,6 +5,13 @@ import os
 import re
 import logging
 
+def send_notification(message, level="ERROR"):
+    """Функция-заглушка для отправки уведомлений. Пока просто логирует сообщение."""
+    if level == "ERROR":
+        logging.error(f"УВЕДОМЛЕНИЕ: {message}")
+    else:
+        logging.info(f"УВЕДОМЛЕНИЕ: {message}")
+
 # --- КОНФИГУРАЦИЯ ---
 DEEPGRAM_API_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".deepgram_api_key")
 NVIDIA_API_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".nvidia_api_key")
@@ -33,7 +40,9 @@ TRANSCRIPT_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 def transcribe_with_deepgram(video_path):
     """Транскрибирует видеофайл с помощью Deepgram API, используя кэширование."""
     if not DEEPGRAM_API_KEY:
-        logging.error(f"Ошибка: DEEPGRAM_API_KEY не установлен. Пожалуйста, создайте файл {DEEPGRAM_API_KEY_FILE} и поместите в него ваш ключ.")
+        error_message = f"Ошибка: DEEPGRAM_API_KEY не установлен. Пожалуйста, создайте файл {DEEPGRAM_API_KEY_FILE} и поместите в него ваш ключ."
+        logging.error(error_message)
+        send_notification(error_message)
         sys.exit(1)
 
     # Создаем директорию для кэша, если ее нет
@@ -133,16 +142,22 @@ def transcribe_with_deepgram(video_path):
         
         return " ".join(full_text_with_timecodes)
     except requests.exceptions.RequestException as e:
-        logging.error(f"Ошибка при обращении к Deepgram API: {e}")
+        error_message = f"Ошибка при обращении к Deepgram API: {e}"
+        logging.error(error_message)
+        send_notification(error_message)
         sys.exit(1)
     except Exception as e:
-        logging.error(f"Неизвестная ошибка при транскрипции с Deepgram: {e}")
+        error_message = f"Неизвестная ошибка при транскрипции с Deepgram: {e}"
+        logging.error(error_message)
+        send_notification(error_message)
         sys.exit(1)
 
 def analyze_with_nvidia_llm(transcript):
     """Отправляет транскрипт в NVIDIA API и получает структурированный Markdown."""
     if not NVIDIA_API_KEY:
-        logging.error(f"Ошибка: NVIDIA_API_KEY не установлен. Пожалуйста, создайте файл {NVIDIA_API_KEY_FILE} и поместите в него ваш ключ.")
+        error_message = f"Ошибка: NVIDIA_API_KEY не установлен. Пожалуйста, создайте файл {NVIDIA_API_KEY_FILE} и поместите в него ваш ключ."
+        logging.error(error_message)
+        send_notification(error_message)
         sys.exit(1)
     prompt = f"""Ты — ИИ-аналитик, помогающий исследователю из Общества Сторожевой Башни. 
     Твоя задача — проанализировать предоставленную стенограмму лекции на русском языке, чтобы найти ключевые "наглядные пособия" или "примеры" и объяснения библейских стихов для дальнейшего исследования.
@@ -200,6 +215,9 @@ def analyze_with_nvidia_llm(transcript):
         response.raise_for_status()
         return response.json().get('choices')[0].get('message').get('content', '')
     except Exception as e:
+        error_message = f"Ошибка при обращении к NVIDIA API: {e}"
+        logging.error(error_message)
+        send_notification(error_message)
         return f"Error communicating with NVIDIA API: {e}"
 
 def main():
@@ -221,7 +239,9 @@ def main():
     logging.info("Транскрипция завершена.")
     
     if not transcript_with_timecodes:
-        logging.error("Ошибка: Транскрипция не удалась или вернула пустой результат.")
+        error_message = "Ошибка: Транскрипция не удалась или вернула пустой результат."
+        logging.error(error_message)
+        send_notification(error_message)
         sys.exit(1)
 
     logging.info("Начало анализа LLM (NVIDIA API)...")
@@ -229,7 +249,9 @@ def main():
     logging.info("Анализ LLM (NVIDIA API) завершен.")
     
     if markdown_output.startswith("Error"):
-        logging.error(f"Ошибка LLM-анализа: {markdown_output}")
+        error_message = f"Ошибка LLM-анализа: {markdown_output}"
+        logging.error(error_message)
+        send_notification(error_message)
         sys.exit(1)
 
     title_line = next((line for line in markdown_output.split('\n') if line.startswith('title:')), None)
