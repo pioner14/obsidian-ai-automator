@@ -274,6 +274,7 @@ def main():
         f.write(markdown_output)
 
     logging.info(f"Успех. Obsidian заметка создана: {output_path}")
+    return output_path
 
 if __name__ == "__main__":
     main()

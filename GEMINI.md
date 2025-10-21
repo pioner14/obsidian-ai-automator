@@ -93,6 +93,7 @@ Before running the project, ensure you have the following installed and configur
     ```bash
     ./obsidian-ai-transcribe.sh /path/to/your/video.mp4
     ```
+    **Note:** Upon successful creation of the Obsidian note, the original video file will be automatically deleted.
 
 ## Development Conventions
 
