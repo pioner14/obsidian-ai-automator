@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project provides an automated workflow to transcribe video files, analyze their content using a local Large Language Model (LLM) via Ollama, and generate structured Markdown notes for Obsidian. It's designed to help researchers quickly extract key insights and examples from lectures or other spoken content.
+This project provides an automated workflow to transcribe video files using Deepgram, analyze their content using NVIDIA Large Language Models (LLM) via NVIDIA API, and generate structured Markdown notes for Obsidian. It's designed to help researchers quickly extract key insights and examples from lectures or other spoken content.
 
 The workflow consists of a Bash wrapper script that orchestrates audio extraction, transcription, and LLM-driven analysis, ultimately saving the processed information into an Obsidian vault.
 
@@ -10,10 +10,10 @@ The workflow consists of a Bash wrapper script that orchestrates audio extractio
 
 *   **Bash:** For the main automation wrapper script.
 *   **FFmpeg:** For extracting audio from video files.
-*   **Whisper.cpp (CUDA version):** For high-performance audio transcription, specifically using the `large-v3` model for Russian language.
-*   **Python:** For interacting with the Ollama API, processing transcripts, and formatting output for Obsidian.
-*   **`requests` (Python library):** For making HTTP requests to the Ollama server.
-*   **Ollama:** A local LLM serving platform used for semantic analysis of transcripts.
+*   **Python:** For interacting with Deepgram and NVIDIA APIs, processing transcripts, and formatting output for Obsidian.
+*   **`requests` (Python library):** For making HTTP requests to Deepgram and NVIDIA servers.
+*   **Deepgram:** For high-performance audio/video transcription.
+*   **NVIDIA API:** For accessing NVIDIA Large Language Models for semantic analysis of transcripts.
 *   **Obsidian:** The target note-taking application where the generated Markdown files are stored.
 
 ## Building and Running
@@ -27,19 +27,16 @@ Before running the project, ensure you have the following installed and configur
     # Example for Arch Linux (adjust for your distribution)
     sudo pacman -S ffmpeg
     ```
-2.  **Whisper.cpp (CUDA version) and `large-v3` model:**
+2.  **Deepgram API Key:**
+    Obtain a Deepgram API key from [deepgram.com](https://deepgram.com/). Set it as an environment variable:
     ```bash
-    # Example for Arch Linux using paru (AUR helper)
-    paru -S whisper.cpp-cuda whisper.cpp-model-large-v3
+    export DEEPGRAM_API_KEY="YOUR_DEEPGRAM_API_KEY"
     ```
-    Ensure `WHISPER_CMD` in `obsidian-ai-transcribe.sh` points to the correct executable (e.g., `/usr/bin/whisper.cpp-cuda`) and `WHISPER_MODEL_PATH` points to the `ggml-large-v3.bin` model (e.g., `/usr/share/whisper-cpp/models/ggml-large-v3.bin`).
-3.  **Ollama:**
-    Install Ollama from [ollama.com](https://ollama.com/).
-    Pull the desired model (e.g., `phi3:mini`):
+3.  **NVIDIA API Key:**
+    Obtain an NVIDIA API key from [nvidia.com](https://www.nvidia.com/developer/ai-foundation-models/). Set it as an environment variable:
     ```bash
-    ollama pull phi3:mini
+    export NVIDIA_API_KEY="YOUR_NVIDIA_API_KEY"
     ```
-    Ensure `OLLAMA_MODEL` in `scripts/ai_analyzer.py` matches the model you pulled.
 4.  **Python 3 and `requests` library:**
     ```bash
     pip install requests
@@ -65,18 +62,19 @@ Before running the project, ensure you have the following installed and configur
     ```
 2.  **Create `scripts/ai_analyzer.py`:**
     (Already done)
-    This Python script handles reading Whisper transcripts, sending them to Ollama for analysis, and formatting the output as Obsidian Markdown notes.
+    This Python script handles Deepgram transcription, sending transcripts to NVIDIA API for analysis, and formatting the output as Obsidian Markdown notes.
 3.  **Create `obsidian-ai-transcribe.sh`:**
     (Already done)
     This Bash script is the main entry point, coordinating audio extraction, transcription, and calling the Python analyzer.
 
 ### Running the Workflow
 
-1.  **Start Ollama Server (if not already running):**
+1.  **Set API Keys:**
+    Ensure your `DEEPGRAM_API_KEY` and `NVIDIA_API_KEY` environment variables are set before running the script.
     ```bash
-    ollama serve &
+    export DEEPGRAM_API_KEY="YOUR_DEEPGRAM_API_KEY"
+    export NVIDIA_API_KEY="YOUR_NVIDIA_API_KEY"
     ```
-    This command runs Ollama in the background. You only need to do this once after a system reboot.
 2.  **Execute the main script:**
     Navigate to the project root directory:
     ```bash

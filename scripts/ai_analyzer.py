@@ -6,18 +6,12 @@ import re
 import logging
 
 # --- КОНФИГУРАЦИЯ ---
-# Пытаемся получить ключ из файла .deepgram_api_key в корне проекта
-DEEPGRAM_API_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".deepgram_api_key")
-DEEPGRAM_API_KEY = None
-if os.path.exists(DEEPGRAM_API_KEY_FILE):
-    with open(DEEPGRAM_API_KEY_FILE, 'r') as f:
-        DEEPGRAM_API_KEY = f.read().strip()
-else:
-    logging.warning(f"Файл {DEEPGRAM_API_KEY_FILE} не найден. Пожалуйста, создайте его и поместите ваш Deepgram API ключ.")
+DEEPGRAM_API_KEY = os.environ.get("DEEPGRAM_API_KEY")
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY")
 
-OLLAMA_API_URL = "http://localhost:11434/api/generate"
-OLLAMA_MODEL = "deepseek-coder:lms" 
-OBSIDIAN_VAULT_PATH = os.path.expanduser("/home/nick/Obsidian Vault/Auto_Notes") 
+NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+NVIDIA_MODEL = "nvidia/nemotron-4-340b-instruct" # Или другая подходящая модель NVIDIA
+OBSIDIAN_VAULT_PATH = os.path.expanduser("/home/nick/Obsidian Vault/Auto_Notes")
 TRANSCRIPT_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".deepgram_cache")
 # ---------------------
 
@@ -98,9 +92,11 @@ def transcribe_with_deepgram(video_path):
         logging.error(f"Неизвестная ошибка при транскрипции с Deepgram: {e}")
         sys.exit(1)
 
-def analyze_with_ollama(transcript):
-    """Отправляет транскрипт в Ollama и получает структурированный Markdown."""
-    
+def analyze_with_nvidia_llm(transcript):
+    """Отправляет транскрипт в NVIDIA API и получает структурированный Markdown."""
+    if not NVIDIA_API_KEY:
+        logging.error("Ошибка: NVIDIA_API_KEY не установлен. Пожалуйста, установите переменную окружения NVIDIA_API_KEY.")
+        sys.exit(1)
     prompt = f"""Ты — ИИ-аналитик, помогающий исследователю из Общества Сторожевой Башни. 
     Твоя задача — проанализировать предоставленную стенограмму лекции на русском языке, чтобы найти ключевые "наглядные пособия" или "примеры" и объяснения библейских стихов для дальнейшего исследования.
     **Крайне важно:**
@@ -117,7 +113,7 @@ def analyze_with_ollama(transcript):
     ```markdown
     ---
     title: Твой сгенерированный заголовок
-    tags: [jw, research, transcript, {OLLAMA_MODEL}]
+    tags: [jw, research, transcript, {NVIDIA_MODEL}]
     ---
 
     ## Анализ: Ключевые Примеры (Наглядные Пособия)
@@ -136,20 +132,28 @@ def analyze_with_ollama(transcript):
     {transcript}
     """
     
-    headers = {'Content-Type': 'application/json'}
+    headers = {
+        "Authorization": f"Bearer {NVIDIA_API_KEY}",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
     data = {
-        "model": OLLAMA_MODEL,
-        "prompt": prompt,
-        "stream": False,
-        "options": {"temperature": 0.3}
+        "model": NVIDIA_MODEL,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.3,
+        "top_p": 0.7,
+        "max_tokens": 1024,
+        "stream": False
     }
 
     try:
-        response = requests.post(OLLAMA_API_URL, headers=headers, json=data)
+        response = requests.post(NVIDIA_API_URL, headers=headers, json=data)
         response.raise_for_status()
-        return response.json().get('response', '')
+        return response.json().get('choices')[0].get('message').get('content', '')
     except Exception as e:
-        return f"Error communicating with Ollama: {e}"
+        return f"Error communicating with NVIDIA API: {e}"
 
 def main():
     logging.basicConfig(level=logging.INFO,
@@ -173,9 +177,9 @@ def main():
         logging.error("Ошибка: Транскрипция не удалась или вернула пустой результат.")
         sys.exit(1)
 
-    logging.info("Начало анализа LLM (Ollama)...")
-    markdown_output = analyze_with_ollama(transcript_with_timecodes)
-    logging.info("Анализ LLM завершен.")
+    logging.info("Начало анализа LLM (NVIDIA API)...")
+    markdown_output = analyze_with_nvidia_llm(transcript_with_timecodes)
+    logging.info("Анализ LLM (NVIDIA API) завершен.")
     
     if markdown_output.startswith("Error"):
         logging.error(f"Ошибка LLM-анализа: {markdown_output}")

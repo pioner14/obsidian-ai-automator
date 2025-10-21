@@ -1,0 +1,66 @@
+2025-10-20 17:48:29 - Запуск скрипта мониторинга папки: /media/windows/ai-automator/
+2025-10-20 18:52:05 - Запуск скрипта мониторинга папки: /media/windows/ai-automator/ (метод опроса)
+2025-10-20 18:52:05 - Начало мониторинга папки "/media/windows/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 18:52:05 - Обнаружен файл: /media/windows/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 18:57:18 - Запуск скрипта мониторинга папки: /media/windows/ai-automator/ (метод опроса)
+2025-10-20 18:57:18 - Начало мониторинга папки "/media/windows/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 18:57:18 - Обнаружен файл: /media/windows/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 18:57:18 - Попытка определить MIME-тип файла: /media/windows/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:05:12 - Запуск скрипта мониторинга папки: /media/windows/ai-automator/ (метод опроса)
+2025-10-20 19:05:12 - Начало мониторинга папки "/media/windows/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:05:12 - Обнаружен файл: /media/windows/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:05:12 - Попытка определить MIME-тип файла: /media/windows/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:08:00 - Запуск скрипта мониторинга папки: /media/windows/ai-automator/ (метод опроса)
+2025-10-20 19:08:00 - Начало мониторинга папки "/media/windows/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:22:27 - Запуск скрипта мониторинга папки: /home/nick/ai-automator-watch/ (метод опроса)
+2025-10-20 19:22:27 - Ошибка: Папка для мониторинга "/home/nick/ai-automator-watch/" не существует. Создайте ее или укажите правильный путь.
+2025-10-20 19:24:03 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:24:03 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:28:37 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:28:37 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:28:37 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:28:37 - Вывод команды find: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:30:45 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:30:45 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:30:45 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:30:45 - Обработка FULL_PATH: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:30:45 - Обнаружен файл: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:30:45 - Попытка определить MIME-тип файла: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:34:48 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:34:48 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:34:48 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:34:48 - Обработка FULL_PATH: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:34:48 - Обнаружен файл: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:34:48 - Попытка определить MIME-тип файла: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:39:26 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:39:26 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:39:26 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:39:26 - Обработка FULL_PATH: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:39:26 - Обнаружен файл: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:39:26 - Попытка определить MIME-тип файла: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:40:37 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:40:37 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:40:37 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:40:37 - Обработка FULL_PATH: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:40:37 - Обнаружен файл: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:40:37 - Попытка определить MIME-тип файла: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:41:53 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:41:53 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:41:53 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:41:53 - Обработка FULL_PATH: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:41:53 - Обнаружен файл: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:41:53 - Попытка определить MIME-тип файла: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:43:41 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:43:41 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:43:41 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:43:41 - Обработка FULL_PATH: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:43:41 - Обнаружен файл: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:43:41 - Попытка определить MIME-тип файла: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:43:41 - DEBUG: Executing file command: 'file --mime-type -b "/home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4"'
+2025-10-20 19:45:26 - Запуск скрипта мониторинга папки: /home/nick/Public/ai-automator/ (метод опроса)
+2025-10-20 19:45:26 - Начало мониторинга папки "/home/nick/Public/ai-automator/" на предмет новых видео/аудио файлов...
+2025-10-20 19:45:26 - Выполнение команды find: find "/home/nick/Public/ai-automator/" -maxdepth 1 -type f -print0
+2025-10-20 19:45:26 - Обработка FULL_PATH: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:45:26 - Обнаружен файл: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:45:26 - Попытка определить MIME-тип файла: /home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4
+2025-10-20 19:45:26 - DEBUG: Executing file command: 'file --mime-type -b "/home/nick/Public/ai-automator/jwb-131_U_01_r240P.mp4"'
