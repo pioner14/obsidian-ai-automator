@@ -10,7 +10,7 @@ DEEPGRAM_API_KEY = os.environ.get("DEEPGRAM_API_KEY")
 NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY")
 
 NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
-NVIDIA_MODEL = "nvidia/nemotron-4-340b-instruct" # Или другая подходящая модель NVIDIA
+NVIDIA_MODEL = "deepseek-ai/deepseek-v3.1-terminus" # Или другая подходящая модель NVIDIA
 OBSIDIAN_VAULT_PATH = os.path.expanduser("/home/nick/Obsidian Vault/Auto_Notes")
 TRANSCRIPT_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".deepgram_cache")
 # ---------------------
@@ -144,7 +144,7 @@ def analyze_with_nvidia_llm(transcript):
         ],
         "temperature": 0.3,
         "top_p": 0.7,
-        "max_tokens": 1024,
+        "max_tokens": 8192,
         "stream": False
     }
 
