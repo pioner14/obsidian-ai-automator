@@ -4,6 +4,7 @@ import requests
 import os
 import re
 import logging
+import configparser
 
 def send_notification(message, level="ERROR"):
     """Функция-заглушка для отправки уведомлений. Пока просто логирует сообщение."""
@@ -13,6 +14,10 @@ def send_notification(message, level="ERROR"):
         logging.info(f"УВЕДОМЛЕНИЕ: {message}")
 
 # --- КОНФИГУРАЦИЯ ---
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.ini")
+config = configparser.ConfigParser()
+config.read(CONFIG_FILE)
+
 DEEPGRAM_API_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".deepgram_api_key")
 NVIDIA_API_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".nvidia_api_key")
 
@@ -30,12 +35,11 @@ if os.path.exists(NVIDIA_API_KEY_FILE):
 else:
     logging.warning(f"Файл {NVIDIA_API_KEY_FILE} не найден. Пожалуйста, создайте его и поместите ваш NVIDIA API ключ.")
 
-NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
-NVIDIA_MODEL = "deepseek-ai/deepseek-v3.1-terminus" # Или другая подходящая модель NVIDIA
-OBSIDIAN_VAULT_PATH = os.path.expanduser("/home/nick/Obsidian Vault/Auto_Notes")
-TRANSCRIPT_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".deepgram_cache")
+NVIDIA_API_URL = config.get('NVIDIA_API', 'api_url')
+NVIDIA_MODEL = config.get('NVIDIA_API', 'model')
+OBSIDIAN_VAULT_PATH = os.path.expanduser(config.get('Paths', 'obsidian_vault_path'))
+TRANSCRIPT_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", config.get('Paths', 'transcript_cache_directory'))
 # ---------------------
-
 
 def transcribe_with_deepgram(video_path):
     """Транскрибирует видеофайл с помощью Deepgram API, используя кэширование."""

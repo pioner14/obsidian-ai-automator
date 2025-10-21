@@ -35,8 +35,24 @@ Before running the project, ensure you have the following installed and configur
     ```bash
     pip install requests
     ```
-5.  **Obsidian Vault:**
-    Ensure `OBSIDIAN_VAULT_PATH` in `scripts/ai_analyzer.py` is correctly set to the desired directory within your Obsidian vault where notes should be saved (e.g., `/home/nick/Obsidian_Vault/Auto_Notes`).
+5.  **`watchdog` library:**
+    ```bash
+    pip install watchdog
+    ```
+6.  **Configuration File (`config.ini`):**
+    Create a `config.ini` file in the project root. This file will store paths and API settings. An example `config.ini` is:
+    ```ini
+    [Paths]
+    watch_directory = /home/nick/Public/ai-automator/
+    obsidian_vault_path = /home/nick/Obsidian Vault/Auto_Notes
+    transcript_cache_directory = .deepgram_cache
+
+    [NVIDIA_API]
+    api_url = https://integrate.api.nvidia.com/v1/chat/completions
+    model = deepseek-ai/deepseek-v3.1-terminus
+    ```
+7.  **Obsidian Vault:**
+    Ensure `obsidian_vault_path` in `config.ini` is correctly set to the desired directory within your Obsidian vault where notes should be saved (e.g., `/home/nick/Obsidian_Vault/Auto_Notes`).
 
 ### Setup
 
@@ -79,6 +95,6 @@ Before running the project, ensure you have the following installed and configur
 
 *   **Git Usage:** The project uses Git for version control. Commits should have clear, descriptive messages.
 *   **Script Structure:** Bash scripts are used for orchestration, while Python handles more complex logic and API interactions.
-*   **Configuration:** Key paths and model names are defined as variables at the top of the scripts for easy modification.
+*   **Configuration:** All key paths and model names are now defined in `config.ini` for easy modification.
 *   **Temporary Files:** Intermediate audio and JSON transcript files are stored in `/tmp` and cleaned up after processing.
 *   **Obsidian Integration:** Generated Markdown files include YAML frontmatter and Obsidian callouts for structured note-taking.

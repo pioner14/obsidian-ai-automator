@@ -2,11 +2,16 @@ import sys
 import time
 import logging
 import os
+import configparser
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # --- КОНФИГУРАЦИЯ ---
-WATCH_DIR = os.path.expanduser("/home/nick/Public/ai-automator/")
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config.ini")
+config = configparser.ConfigParser()
+config.read(CONFIG_FILE)
+
+WATCH_DIR = os.path.expanduser(config.get('Paths', 'watch_directory'))
 OBSIDIAN_TRANSCRIBE_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "obsidian-ai-transcribe.sh")
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".inotify_monitor.log")
 # --------------------
