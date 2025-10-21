@@ -8,7 +8,12 @@ SLEEP_INTERVAL=10 # Интервал опроса в секундах
 
 # --- ФУНКЦИИ ---
 log_message() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" | tee -a "$LOG_FILE"
+    local MESSAGE="$1"
+    local LEVEL="${2:-INFO}" # По умолчанию INFO
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $LEVEL - $MESSAGE" | tee -a "$LOG_FILE"
+    if [[ "$LEVEL" == "ERROR" ]]; then
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - ERROR - $MESSAGE" >&2
+    fi
 }
 
 # --- ОСНОВНАЯ ЛОГИКА ---
@@ -16,7 +21,7 @@ log_message "Запуск скрипта мониторинга папки: $WAT
 
 # Проверка существования папки для мониторинга
 if [ ! -d "$WATCH_DIR" ]; then
-    log_message "Ошибка: Папка для мониторинга \"$WATCH_DIR\" не существует. Создайте ее или укажите правильный путь."
+    log_message "Ошибка: Папка для мониторинга \"$WATCH_DIR\" не существует. Создайте ее или укажите правильный путь." ERROR
     exit 1
 fi
 
@@ -42,7 +47,7 @@ while true; do
         
         # Проверяем существование и исполняемость команды 'file'
         if ! command -v file &> /dev/null; then
-            log_message "Ошибка: Команда 'file' не найдена. Убедитесь, что она установлена и доступна в PATH."
+            log_message "Ошибка: Команда 'file' не найдена. Убедитесь, что она установлена и доступна в PATH." ERROR
             continue
         fi
 
@@ -64,7 +69,7 @@ while true; do
         MIME_TYPE_EXIT_CODE="$_FILE_EXIT_CODE"
 
         if [ "$MIME_TYPE_EXIT_CODE" -ne 0 ]; then
-            log_message "Ошибка: Команда 'file' завершилась с ошибкой ($MIME_TYPE_EXIT_CODE) для файла \"$FILENAME\". Вывод: $MIME_TYPE_OUTPUT. Пропускаю."
+            log_message "Ошибка: Команда 'file' завершилась с ошибкой ($MIME_TYPE_EXIT_CODE) для файла \"$FILENAME\". Вывод: $MIME_TYPE_OUTPUT. Пропускаю." ERROR
             continue
         fi
         MIME_TYPE="$MIME_TYPE_OUTPUT"
@@ -82,7 +87,7 @@ while true; do
                 log_message "Успешная обработка файла \"$FILENAME\". Удаляю исходный файл."
                 rm "$FULL_PATH"
             else
-                log_message "Ошибка при обработке файла \"$FILENAME\". Код выхода: $EXIT_CODE. Файл не будет удален."
+                log_message "Ошибка при обработке файла \"$FILENAME\". Код выхода: $EXIT_CODE. Файл не будет удален." ERROR
             fi
         else
             log_message "Файл \"$FILENAME\" не является аудио/видео ($MIME_TYPE). Пропускаю."

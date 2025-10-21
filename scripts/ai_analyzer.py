@@ -41,16 +41,36 @@ def transcribe_with_deepgram(video_path):
 
     # Генерируем имя кэш-файла на основе имени видеофайла
     video_filename = os.path.basename(video_path)
-    cache_filename = os.path.join(TRANSCRIPT_CACHE_DIR, f"{video_filename}.json")
+    json_cache_filename = os.path.join(TRANSCRIPT_CACHE_DIR, f"{video_filename}.json")
+    text_cache_filename = os.path.join(TRANSCRIPT_CACHE_DIR, f"{video_filename}.txt")
 
-    # Проверяем, существует ли кэшированный транскрипт
-    if os.path.exists(cache_filename):
-        logging.info(f"Используем кэшированный транскрипт для {video_filename}")
+    # Проверяем, существует ли кэшированный текстовый транскрипт
+    if os.path.exists(text_cache_filename):
+        logging.info(f"Используем кэшированный текстовый транскрипт для {video_filename}")
+        with open(text_cache_filename, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    # Проверяем, существует ли кэшированный JSON-транскрипт
+    if os.path.exists(json_cache_filename):
+        logging.info(f"Используем кэшированный JSON-транскрипт для {video_filename}")
         try:
-            with open(cache_filename, 'r', encoding='utf-8') as f:
+            with open(json_cache_filename, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            # Извлечение транскрипта с тайм-кодами из кэшированных данных
-            full_text = []
+            # Извлечение полного текста из JSON для сохранения в текстовый кэш
+            full_text_from_json = []
+            if 'results' in data and 'channels' in data['results'] and data['results']['channels']:
+                for channel in data['results']['channels']:
+                    for alternative in channel['alternatives']:
+                        full_text_from_json.append(alternative['transcript'])
+            plain_text_transcript = " ".join(full_text_from_json).strip()
+
+            # Сохраняем чистый текстовый транскрипт в кэш-файл
+            with open(text_cache_filename, 'w', encoding='utf-8') as f:
+                f.write(plain_text_transcript)
+            logging.info(f"Чистый текстовый транскрипт сохранен в кэш: {text_cache_filename}")
+
+            # Извлечение транскрипта с тайм-кодами для возврата
+            full_text_with_timecodes = []
             if 'results' in data and 'channels' in data['results'] and data['results']['channels']:
                 for channel in data['results']['channels']:
                     for alternative in channel['alternatives']:
@@ -58,12 +78,12 @@ def transcribe_with_deepgram(video_path):
                             start_time = str(int(word_info['start'] // 3600)).zfill(2) + ':' + \
                                          str(int((word_info['start'] % 3600) // 60)).zfill(2) + ':' + \
                                          str(int(word_info['start'] % 60)).zfill(2)
-                            full_text.append(f"[{start_time}] {word_info['word'].strip()}")
-            return " ".join(full_text)
+                            full_text_with_timecodes.append(f"[{start_time}] {word_info['word'].strip()}")
+            return " ".join(full_text_with_timecodes)
         except Exception as e:
-            logging.error(f"Ошибка при чтении кэш-файла {cache_filename}: {e}. Повторяем транскрипцию.")
+            logging.error(f"Ошибка при чтении кэш-файла {json_cache_filename}: {e}. Повторяем транскрипцию.")
             # Если кэш-файл поврежден, удаляем его и продолжаем без него
-            os.remove(cache_filename)
+            os.remove(json_cache_filename)
 
     logging.info(f"Кэшированный транскрипт для {video_filename} не найден или поврежден. Выполняем транскрипцию с Deepgram API...")
 
@@ -83,12 +103,25 @@ def transcribe_with_deepgram(video_path):
         data = response.json()
         
         # Сохраняем полный ответ Deepgram в кэш-файл
-        with open(cache_filename, 'w', encoding='utf-8') as f:
+        with open(json_cache_filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
-        logging.info(f"Транскрипт Deepgram сохранен в кэш: {cache_filename}")
+        logging.info(f"Полный JSON-транскрипт Deepgram сохранен в кэш: {json_cache_filename}")
 
-        # Извлечение транскрипта с тайм-кодами
-        full_text = []
+        # Извлечение чистого текста транскрипции для сохранения в текстовый кэш
+        plain_text_transcript = ""
+        if 'results' in data and 'channels' in data['results'] and data['results']['channels']:
+            for channel in data['results']['channels']:
+                for alternative in channel['alternatives']:
+                    plain_text_transcript += alternative['transcript'] + " "
+        plain_text_transcript = plain_text_transcript.strip()
+
+        # Сохраняем чистый текстовый транскрипт в кэш-файл
+        with open(text_cache_filename, 'w', encoding='utf-8') as f:
+            f.write(plain_text_transcript)
+        logging.info(f"Чистый текстовый транскрипт сохранен в кэш: {text_cache_filename}")
+
+        # Извлечение транскрипта с тайм-кодами для возврата
+        full_text_with_timecodes = []
         if 'results' in data and 'channels' in data['results'] and data['results']['channels']:
             for channel in data['results']['channels']:
                 for alternative in channel['alternatives']:
@@ -96,9 +129,9 @@ def transcribe_with_deepgram(video_path):
                         start_time = str(int(word_info['start'] // 3600)).zfill(2) + ':' + \
                                      str(int((word_info['start'] % 3600) // 60)).zfill(2) + ':' + \
                                      str(int(word_info['start'] % 60)).zfill(2)
-                        full_text.append(f"[{start_time}] {word_info['word'].strip()}")
+                        full_text_with_timecodes.append(f"[{start_time}] {word_info['word'].strip()}")
         
-        return " ".join(full_text) # Deepgram возвращает слова, объединяем их
+        return " ".join(full_text_with_timecodes)
     except requests.exceptions.RequestException as e:
         logging.error(f"Ошибка при обращении к Deepgram API: {e}")
         sys.exit(1)
