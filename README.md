@@ -28,15 +28,9 @@ Before running the project, ensure you have the following installed and configur
     sudo pacman -S ffmpeg
     ```
 2.  **Deepgram API Key:**
-    Obtain a Deepgram API key from [deepgram.com](https://deepgram.com/). Set it as an environment variable:
-    ```bash
-    export DEEPGRAM_API_KEY="YOUR_DEEPGRAM_API_KEY"
-    ```
+    Obtain a Deepgram API key from [deepgram.com](https://deepgram.com/). Create a file named `.deepgram_api_key` in the project root and paste your key into it.
 3.  **NVIDIA API Key:**
-    Obtain an NVIDIA API key from [nvidia.com](https://www.nvidia.com/developer/ai-foundation-models/). Set it as an environment variable:
-    ```bash
-    export NVIDIA_API_KEY="YOUR_NVIDIA_API_KEY"
-    ```
+    Obtain an NVIDIA API key from [nvidia.com](https://www.nvidia.com/developer/ai-foundation-models/). Create a file named `.nvidia_api_key` in the project root and paste your key into it.
 4.  **Python 3 and `requests` library:**
     ```bash
     pip install requests
@@ -69,12 +63,8 @@ Before running the project, ensure you have the following installed and configur
 
 ### Running the Workflow
 
-1.  **Set API Keys:**
-    Ensure your `DEEPGRAM_API_KEY` and `NVIDIA_API_KEY` environment variables are set before running the script.
-    ```bash
-    export DEEPGRAM_API_KEY="YOUR_DEEPGRAM_API_KEY"
-    export NVIDIA_API_KEY="YOUR_NVIDIA_API_KEY"
-    ```
+1.  **Provide API Keys:**
+    Ensure your Deepgram API key is in `.deepgram_api_key` and your NVIDIA API key is in `.nvidia_api_key` in the project root directory.
 2.  **Execute the main script:**
     Navigate to the project root directory:
     ```bash

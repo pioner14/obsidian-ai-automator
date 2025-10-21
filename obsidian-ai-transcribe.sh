@@ -14,7 +14,7 @@ fi
 echo "-> 1/2: Транскрипция (Deepgram API) и анализ LLM (NVIDIA API) и запись в Obsidian..."
 PYTHON_SCRIPT_PATH="$(pwd)/scripts/ai_analyzer.py" 
 # Явно передаем DEEPGRAM_API_KEY в окружение Python-скрипта
-source venv/bin/activate && DEEPGRAM_API_KEY="$DEEPGRAM_API_KEY" NVIDIA_API_KEY="$NVIDIA_API_KEY" python "$PYTHON_SCRIPT_PATH" "$INPUT_VIDEO"
+source venv/bin/activate && python "$PYTHON_SCRIPT_PATH" "$INPUT_VIDEO"
 
 # Очистка временных файлов (если ai_analyzer.py создает их)
 # В данном случае, Deepgram обрабатывает видео напрямую, поэтому временный аудиофайл не создается здесь.

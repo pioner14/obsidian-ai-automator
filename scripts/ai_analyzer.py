@@ -6,8 +6,22 @@ import re
 import logging
 
 # --- КОНФИГУРАЦИЯ ---
-DEEPGRAM_API_KEY = os.environ.get("DEEPGRAM_API_KEY")
-NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY")
+DEEPGRAM_API_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".deepgram_api_key")
+NVIDIA_API_KEY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".nvidia_api_key")
+
+DEEPGRAM_API_KEY = None
+if os.path.exists(DEEPGRAM_API_KEY_FILE):
+    with open(DEEPGRAM_API_KEY_FILE, 'r') as f:
+        DEEPGRAM_API_KEY = f.read().strip()
+else:
+    logging.warning(f"Файл {DEEPGRAM_API_KEY_FILE} не найден. Пожалуйста, создайте его и поместите ваш Deepgram API ключ.")
+
+NVIDIA_API_KEY = None
+if os.path.exists(NVIDIA_API_KEY_FILE):
+    with open(NVIDIA_API_KEY_FILE, 'r') as f:
+        NVIDIA_API_KEY = f.read().strip()
+else:
+    logging.warning(f"Файл {NVIDIA_API_KEY_FILE} не найден. Пожалуйста, создайте его и поместите ваш NVIDIA API ключ.")
 
 NVIDIA_API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 NVIDIA_MODEL = "deepseek-ai/deepseek-v3.1-terminus" # Или другая подходящая модель NVIDIA
@@ -19,7 +33,7 @@ TRANSCRIPT_CACHE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
 def transcribe_with_deepgram(video_path):
     """Транскрибирует видеофайл с помощью Deepgram API, используя кэширование."""
     if not DEEPGRAM_API_KEY:
-        logging.error("Ошибка: DEEPGRAM_API_KEY не установлен. Пожалуйста, создайте файл .deepgram_api_key и поместите в него ваш ключ.")
+        logging.error(f"Ошибка: DEEPGRAM_API_KEY не установлен. Пожалуйста, создайте файл {DEEPGRAM_API_KEY_FILE} и поместите в него ваш ключ.")
         sys.exit(1)
 
     # Создаем директорию для кэша, если ее нет
@@ -95,7 +109,7 @@ def transcribe_with_deepgram(video_path):
 def analyze_with_nvidia_llm(transcript):
     """Отправляет транскрипт в NVIDIA API и получает структурированный Markdown."""
     if not NVIDIA_API_KEY:
-        logging.error("Ошибка: NVIDIA_API_KEY не установлен. Пожалуйста, установите переменную окружения NVIDIA_API_KEY.")
+        logging.error(f"Ошибка: NVIDIA_API_KEY не установлен. Пожалуйста, создайте файл {NVIDIA_API_KEY_FILE} и поместите в него ваш ключ.")
         sys.exit(1)
     prompt = f"""Ты — ИИ-аналитик, помогающий исследователю из Общества Сторожевой Башни. 
     Твоя задача — проанализировать предоставленную стенограмму лекции на русском языке, чтобы найти ключевые "наглядные пособия" или "примеры" и объяснения библейских стихов для дальнейшего исследования.
