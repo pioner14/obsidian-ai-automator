@@ -50,6 +50,9 @@ Before running the project, ensure you have the following installed and configur
     [NVIDIA_API]
     api_url = https://integrate.api.nvidia.com/v1/chat/completions
     model = deepseek-ai/deepseek-v3.1-terminus
+
+    [File_Filtering]
+    allowed_extensions = .mp4, .mov, .avi, .mp3, .wav
     ```
 7.  **Obsidian Vault:**
     Ensure `obsidian_vault_path` in `config.ini` is correctly set to the desired directory within your Obsidian vault where notes should be saved (e.g., `/home/nick/Obsidian_Vault/Auto_Notes`).
@@ -94,7 +97,7 @@ Before running the project, ensure you have the following installed and configur
 ## Development Conventions
 
 *   **Git Usage:** The project uses Git for version control. Commits should have clear, descriptive messages.
-*   **Script Structure:** Bash scripts are used for orchestration, while Python handles more complex logic and API interactions.
+*   **Script Structure:** Bash scripts are used for orchestration, while Python handles more complex logic and API interactions, including parallel file processing.
 *   **Configuration:** All key paths and model names are now defined in `config.ini` for easy modification.
 *   **Temporary Files:** Intermediate audio and JSON transcript files are stored in `/tmp` and cleaned up after processing.
 *   **Obsidian Integration:** Generated Markdown files include YAML frontmatter and Obsidian callouts for structured note-taking.

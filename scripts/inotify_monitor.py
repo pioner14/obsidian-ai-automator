@@ -3,6 +3,7 @@ import time
 import logging
 import os
 import configparser
+import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -32,23 +33,25 @@ class NewFileHandler(FileSystemEventHandler):
             self.process_file(file_path)
 
     def process_file(self, file_path):
-        # Проверяем, является ли файл видео или аудио (можно улучшить)
-        # Для простоты пока полагаемся на расширение или MIME-тип, если это возможно
-        # В будущем можно использовать команду 'file' или более продвинутые методы
+        allowed_extensions_str = config.get('File_Filtering', 'allowed_extensions', fallback='')
+        allowed_extensions = [ext.strip() for ext in allowed_extensions_str.split(',') if ext.strip()]
+
+        file_extension = os.path.splitext(file_path)[1].lower()
+
+        if allowed_extensions and file_extension not in allowed_extensions:
+            logging.info(f"Файл {file_path} имеет неподдерживаемое расширение ({file_extension}). Пропускаю.")
+            return
         
-        # Простой пример: если файл не является временным или скрытым
-        if not os.path.basename(file_path).startswith('.') and not file_path.endswith('~'):
-            logging.info(f"Начинаю обработку файла: {file_path}")
-            # Вызываем основной скрипт обработки
-            # Убедитесь, что obsidian-ai-transcribe.sh имеет права на выполнение
-            command = f"{OBSIDIAN_TRANSCRIBE_SCRIPT} "{file_path}""
-            logging.info(f"Выполнение команды: {command}")
-            try:
-                # Запускаем скрипт в отдельном процессе, чтобы не блокировать монитор
-                os.system(command) 
-                logging.info(f"Обработка файла {file_path} завершена.")
-            except Exception as e:
-                logging.error(f"Ошибка при обработке файла {file_path}: {e}")
+        logging.info(f"Начинаю обработку файла: {file_path}")
+        # Вызываем основной скрипт обработки
+        # Убедитесь, что obsidian-ai-transcribe.sh имеет права на выполнение
+        command = [OBSIDIAN_TRANSCRIBE_SCRIPT, file_path]
+        logging.info(f"Запуск обработки файла {file_path} в фоновом режиме: {' '.join(command)}")
+        try:
+            subprocess.Popen(command) 
+            logging.info(f"Файл {file_path} передан для фоновой обработки.")
+        except Exception as e:
+            logging.error(f"Ошибка при запуске обработки файла {file_path}: {e}")
 
 def main():
     logging.info(f"Запуск мониторинга папки: {WATCH_DIR} с inotify...")
