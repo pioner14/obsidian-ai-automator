@@ -7,3 +7,4 @@ ai_analyzer.logFUTURE_IMPROVEMENTS.md
 config.ini
 .deepgram_cache/
 .inotify_monitor.log
+ai_analyzer.log
