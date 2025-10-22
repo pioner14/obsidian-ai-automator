@@ -229,18 +229,46 @@ def main():
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         handlers=[
                             logging.FileHandler("ai_analyzer.log"),
-                            logging.StreamHandler()
+                            logging.StreamHandler(sys.stderr)
                         ])
     logging.info("Запуск скрипта ai_analyzer.py")
     if len(sys.argv) < 2:
-        print("Usage: python ai_analyzer.py <path_to_video.mp4>")
+        print("Usage: python ai_analyzer.py <path_to_video_or_transcript_file>")
         sys.exit(1)
 
-    video_path = sys.argv[1]
+    input_path = sys.argv[1]
+    file_extension = os.path.splitext(input_path)[1].lower()
+
+    allowed_video_extensions = config.get('File_Filtering', 'allowed_extensions', fallback='').split(',')
+    allowed_video_extensions = [ext.strip() for ext in allowed_video_extensions if ext.strip()]
     
-    logging.info(f"Начало транскрипции видео с Deepgram API: {video_path}...")
-    transcript_with_timecodes = transcribe_with_deepgram(video_path)
-    logging.info("Транскрипция завершена.")
+    is_video_file = False
+    for ext in allowed_video_extensions:
+        if file_extension == ext:
+            is_video_file = True
+            break
+
+    transcript_with_timecodes = ""
+    if is_video_file:
+        logging.info(f"Начало транскрипции видео с Deepgram API: {input_path}...")
+        transcript_with_timecodes = transcribe_with_deepgram(input_path)
+        logging.info("Транскрипция завершена.")
+    elif file_extension == '.txt':
+        logging.info(f"Используем предоставленный текстовый файл как транскрипт: {input_path}...")
+        try:
+            with open(input_path, 'r', encoding='utf-8') as f:
+                transcript_with_timecodes = f.read()
+            logging.info("Транскрипт успешно прочитан из файла.")
+        except Exception as e:
+            error_message = f"Ошибка при чтении файла транскрипта {input_path}: {e}"
+            logging.error(error_message)
+            send_notification(error_message)
+            sys.exit(1)
+    else:
+        error_message = f"Неподдерживаемый тип входного файла: {input_path}. Ожидается видеофайл или текстовый файл транскрипта."
+        logging.error(error_message)
+        send_notification(error_message)
+        sys.exit(1)
     
     if not transcript_with_timecodes:
         error_message = "Ошибка: Транскрипция не удалась или вернула пустой результат."
@@ -265,7 +293,11 @@ def main():
         safe_filename = re.sub(r'[-\s]+', '_', safe_filename)
         filename = f"{safe_filename}.md"
     else:
-        filename = f"LLM_Analysis_Error_{os.path.basename(video_path).replace('.mp4', '.md')}"
+        base_name = os.path.basename(input_path)
+        if is_video_file:
+            filename = f"LLM_Analysis_{base_name.replace(file_extension, '.md')}"
+        else: # .txt file
+            filename = f"LLM_Analysis_{base_name.replace('.txt', '.md')}"
 
     output_path = os.path.join(OBSIDIAN_VAULT_PATH, filename)
     os.makedirs(OBSIDIAN_VAULT_PATH, exist_ok=True)
